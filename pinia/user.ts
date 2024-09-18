@@ -343,60 +343,54 @@ export const useUserStore = defineStore(STORE_KEY, {
       try {
         const userStore = useUserStore();
         const contract = await userStore.getContract();
-        const api = await userStore.polkadotApi();
-
-        const { result, output } = await contract.query.getUserById(
-          this.accountId!,
-          {
-            gasLimit: api?.registry.createType("WeightV2", {
-              refTime: MAX_CALL_WEIGHT,
-              proofSize: PROOFSIZE,
-            }) as WeightV2,
-            storageDepositLimit,
+        const queryResult = await contract.queryContractSmart(env.contractId, {
+          get_user_by_id: {
+            user_id: userId,
           },
-          userId
-        );
-        if (result.isErr) {
-          throw new Error(result.asErr.toString());
-        }
-        const userInfo = output?.toJSON();
-        const userData = (userInfo as any)?.ok;
+        });
 
-        userData.stores = [];
-        try {
-          const { result: storeResult, output: storeOutput } =
-            await contract.query.getUserStores(
-              this.accountId!,
-              {
-                gasLimit: api?.registry.createType("WeightV2", {
-                  refTime: MAX_CALL_WEIGHT,
-                  proofSize: PROOFSIZE,
-                }) as WeightV2,
-                storageDepositLimit,
-              },
-              userData.authority
-            );
+        throw new Error("not implemented");
+        // if (result.isErr) {
+        //   throw new Error(result.asErr.toString());
+        // }
+        // const userInfo = output?.toJSON();
+        // const userData = (userInfo as any)?.ok;
 
-          if (storeResult.isErr) {
-            throw new Error(result.asErr.toString());
-          }
-          const storeInfo = storeOutput?.toJSON();
-          const storeData = (storeInfo as any)?.ok;
-          userData.userAddress = userData.authority;
-          userData.stores = storeData.map((store: any) => {
-            return {
-              id: store.id.toString(),
-              name: store.name,
-              description: store.description,
-              phone: store.phone,
-              location: [
-                Number(store.location.longitude.toString()),
-                Number(store.location.latitude.toString()),
-              ],
-            };
-          });
-        } catch (_) {}
-        return userData;
+        // userData.stores = [];
+        // try {
+        //   const { result: storeResult, output: storeOutput } =
+        //     await contract.query.getUserStores(
+        //       this.accountId!,
+        //       {
+        //         gasLimit: api?.registry.createType("WeightV2", {
+        //           refTime: MAX_CALL_WEIGHT,
+        //           proofSize: PROOFSIZE,
+        //         }) as WeightV2,
+        //         storageDepositLimit,
+        //       },
+        //       userData.authority
+        //     );
+
+        //   if (storeResult.isErr) {
+        //     throw new Error(result.asErr.toString());
+        //   }
+        //   const storeInfo = storeOutput?.toJSON();
+        //   const storeData = (storeInfo as any)?.ok;
+        //   userData.userAddress = userData.authority;
+        //   userData.stores = storeData.map((store: any) => {
+        //     return {
+        //       id: store.id.toString(),
+        //       name: store.name,
+        //       description: store.description,
+        //       phone: store.phone,
+        //       location: [
+        //         Number(store.location.longitude.toString()),
+        //         Number(store.location.latitude.toString()),
+        //       ],
+        //     };
+        // });
+        // } catch (_) {}
+        // return userData;
       } catch (error) {
         console.log(error);
         throw error;
