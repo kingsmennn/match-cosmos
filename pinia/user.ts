@@ -72,19 +72,18 @@ export const useUserStore = defineStore(STORE_KEY, {
   },
   actions: {
     async setUpPolkadotConnectEvents() {
-      this.connectToPolkadot();
+      this.connectToCosmos();
       web3AccountsSubscribe((accounts) => {
         if (accounts.length) {
           this.blockchainError.userNotFound = false;
           this.accountId = accounts[0].address;
-          this.connectToPolkadot();
+          this.connectToCosmos();
         }
       });
     },
-    async connectToPolkadot() {
+    async connectToCosmos() {
       try {
         const client = await setupWebKeplr(cosmosConfig);
-        console.log(client);
         const accounts = await connectExtension();
         this.accountId = accounts![0].address;
 
@@ -527,6 +526,17 @@ export const useUserStore = defineStore(STORE_KEY, {
     },
 
     async polkadotApi() {
+      if (apiInstance) {
+        return apiInstance;
+      }
+
+      const wsProvider = new WsProvider(env.polkadotRpcUrl);
+      apiInstance = await ApiPromise.create({
+        provider: wsProvider,
+      });
+      return apiInstance;
+    },
+    async cosmosApi() {
       if (apiInstance) {
         return apiInstance;
       }

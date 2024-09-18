@@ -89,9 +89,8 @@
 
           <NuxtLink
             to="/settings"
-            class="tw-flex tw-bg-white hover:tw-bg-white/80 tw-rounded-full tw-h-7 tw-w-7
-            tw-items-center tw-justify-center tw-leading-none
-            tw-transition-all tw-duration-300">
+            class="tw-flex tw-bg-white hover:tw-bg-white/80 tw-rounded-full tw-h-7 tw-w-7 tw-items-center tw-justify-center tw-leading-none tw-transition-all tw-duration-300"
+          >
             <v-icon class="tw-text-black !tw-text-xl">mdi-cog</v-icon>
           </NuxtLink>
         </div>
@@ -140,7 +139,6 @@ const router = useRouter();
 const route = useRoute();
 const userStore = useUserStore();
 
-
 const userCookie = useCookie<User>(STORE_KEY_MIDDLEWARE, { watch: true });
 const storeCookie = useCookie(STORE_KEY);
 const isSeller = computed(
@@ -151,7 +149,7 @@ const connecting = ref(false);
 const handleWalletConnect = async () => {
   connecting.value = true;
   try {
-    await userStore.connectToPolkadot();
+    await userStore.connectToCosmos();
     // once connected the subscription function will update the user store
   } catch (e) {
     // haldle errors
