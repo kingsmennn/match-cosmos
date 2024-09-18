@@ -14,17 +14,8 @@ import { useStoreStore } from "./store";
 import { SigningCosmWasmClient, setupWebKeplr } from "cosmwasm";
 import { marketAbi } from "@/blockchain/abi";
 import { connectExtension } from "@/utils/connect_web3";
-import { BN, BN_ONE } from "@polkadot/util";
-import type { WeightV2 } from "@polkadot/types/interfaces";
 import { MAX_CALL_WEIGHT, PROOFSIZE } from "@/utils/constants";
-
-import {
-  web3AccountsSubscribe,
-  web3FromAddress,
-} from "@polkadot/extension-dapp";
-import { ApiPromise, WsProvider } from "@polkadot/api";
-
-import { ContractPromise } from "@polkadot/api-contract";
+import BN from "bn.js";
 import { getPolkadotContractResult } from "@/utils/contract-utils";
 
 type UserStore = {
@@ -71,13 +62,13 @@ export const useUserStore = defineStore(STORE_KEY, {
   actions: {
     async setUpCosmosConnectEvents() {
       this.connectToCosmos();
-      web3AccountsSubscribe((accounts) => {
-        if (accounts.length) {
-          this.blockchainError.userNotFound = false;
-          this.accountId = accounts[0].address;
-          this.connectToCosmos();
-        }
-      });
+      // web3AccountsSubscribe((accounts) => {
+      //   if (accounts.length) {
+      //     this.blockchainError.userNotFound = false;
+      //     this.accountId = accounts[0].address;
+      //     this.connectToCosmos();
+      //   }
+      // });
     },
     async connectToCosmos() {
       try {

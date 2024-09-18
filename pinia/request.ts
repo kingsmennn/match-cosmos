@@ -7,12 +7,10 @@ import {
   RequestResponse,
 } from "@/types";
 
+import BN from "bn.js";
+
 import { storageDepositLimit, useUserStore } from "./user";
 import { MAX_CALL_WEIGHT, PROOFSIZE } from "@/utils/constants";
-
-import { BN, BN_ONE } from "@polkadot/util";
-import { web3FromAddress } from "@polkadot/extension-dapp";
-import type { WeightV2 } from "@polkadot/types/interfaces";
 import { getPolkadotContractResult } from "@/utils/contract-utils";
 
 const env = useRuntimeConfig().public;

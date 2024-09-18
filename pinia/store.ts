@@ -3,11 +3,8 @@ import { CreateStoreDTO, Store, STORE_STORE_KEY } from "@/types";
 import { storageDepositLimit, useUserStore } from "./user";
 import { MAX_CALL_WEIGHT, PROOFSIZE } from "@/utils/constants";
 import { LOCATION_DECIMALS } from "@/utils/constants";
-
-import { BN, BN_ONE } from "@polkadot/util";
-import { web3FromAddress } from "@polkadot/extension-dapp";
-import type { WeightV2 } from "@polkadot/types/interfaces";
 import { getPolkadotContractResult } from "@/utils/contract-utils";
+import BN from "bn.js";
 const env = useRuntimeConfig().public;
 
 export const useStoreStore = defineStore(STORE_STORE_KEY, {
