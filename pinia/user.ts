@@ -81,12 +81,13 @@ export const useUserStore = defineStore(STORE_KEY, {
     },
     async connectToCosmos() {
       try {
-        if (!window.keplr) {
+        if (!window.getOfflineSigner || !window.keplr) {
           throw new Error("Keplr extension not installed");
         }
         const keplr = window.keplr;
         await keplr.experimentalSuggestChain(cosmosChainInfo);
-        await window.keplr.enable(cosmosChainInfo.chainId);
+
+        await keplr.enable(cosmosChainInfo.chainId);
 
         const offlineSigner = window.getOfflineSigner(cosmosChainInfo.chainId);
 
@@ -94,7 +95,7 @@ export const useUserStore = defineStore(STORE_KEY, {
 
         this.accountId = accounts![0].address;
 
-        const blockchainUser = await this.fetchUser(this.accountId);
+        const blockchainUser = await this.fetchUser(this.accountId!);
 
         this.storeUserDetails(blockchainUser);
 

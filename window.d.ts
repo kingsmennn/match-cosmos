@@ -27,4 +27,5 @@ interface Window {
   ethereum?: Ethereum;
   solana?: Solana;
   keplr?: Keplr;
+  getOfflineSigner: any;
 }
