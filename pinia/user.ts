@@ -69,7 +69,7 @@ export const useUserStore = defineStore(STORE_KEY, {
     accountType: (state) => state.userDetails?.[6],
   },
   actions: {
-    async setUpPolkadotConnectEvents() {
+    async setUpCosmosConnectEvents() {
       this.connectToCosmos();
       web3AccountsSubscribe((accounts) => {
         if (accounts.length) {
@@ -452,7 +452,7 @@ export const useUserStore = defineStore(STORE_KEY, {
       console.log("store restored");
 
       if (context.store.accountId) {
-        await context.store.setUpPolkadotConnectEvents();
+        await context.store.setUpCosmosConnectEvents();
       }
     },
   },
