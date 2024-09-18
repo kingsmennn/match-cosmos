@@ -226,7 +226,7 @@ export const useUserStore = defineStore(STORE_KEY, {
     }: CreateUserDTO): Promise<string | undefined> {
       try {
         const contract = await this.getContract();
-        const result = await contract.execute(
+        await contract.execute(
           this.accountId!,
           env.contractId,
           {

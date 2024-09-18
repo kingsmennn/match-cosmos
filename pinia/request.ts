@@ -71,54 +71,50 @@ export const useRequestsStore = defineStore("requests", {
       try {
         const userStore = useUserStore();
         const contract = await userStore.getContract();
-        const api = await userStore.polkadotApi();
 
-        const { result, output } = await contract.query.getUserRequests(
-          accountId,
-          {
-            gasLimit: api?.registry.createType("WeightV2", {
-              refTime: MAX_CALL_WEIGHT,
-              proofSize: PROOFSIZE,
-            }) as WeightV2,
-            storageDepositLimit,
+        const queryResult = await contract.queryContractSmart(env.contractId, {
+          get_user_requests: {
+            address: accountId,
           },
-          accountId
-        );
-        if (result.isErr) {
-          throw new Error(result.asErr.toString());
-        }
-        const userInfo = output?.toJSON();
-        const userData = (userInfo as any)?.ok;
-
-        const res: any = userData.map((request: any) => {
-          const lifecycle_ = request.lifecycle.toUpperCase();
-
-          let lifecycle: RequestLifecycleIndex = RequestLifecycleIndex.PENDING;
-
-          Object.entries(RequestLifecycleIndex).forEach(([key, value]) => {
-            if (key.replaceAll("_", "") === lifecycle_) {
-              lifecycle = value as RequestLifecycleIndex;
-            }
-          });
-
-          return {
-            requestId: Number(request.id),
-            requestName: request.name,
-            buyerId: Number(request.buyerId),
-            sellersPriceQuote: Number(request.sellersPriceQuote),
-            lockedSellerId: Number(request.lockedSellerId),
-            description: request.description,
-            lifecycle,
-            longitude: Number(request.location.longitude.toString()),
-            latitude: Number(request.location.latitude.toString()),
-            createdAt: Number(request.createdAt.toString() / 1000),
-            updatedAt: Number(request.updatedAt.toString() / 1000),
-            images: request.images,
-          };
         });
 
-        this.list = res;
-        return res;
+        throw new Error("not implemented");
+
+        // if (result.isErr) {
+        //   throw new Error(result.asErr.toString());
+        // }
+        // const userInfo = output?.toJSON();
+        // const userData = (userInfo as any)?.ok;
+
+        // const res: any = userData.map((request: any) => {
+        //   const lifecycle_ = request.lifecycle.toUpperCase();
+
+        //   let lifecycle: RequestLifecycleIndex = RequestLifecycleIndex.PENDING;
+
+        //   Object.entries(RequestLifecycleIndex).forEach(([key, value]) => {
+        //     if (key.replaceAll("_", "") === lifecycle_) {
+        //       lifecycle = value as RequestLifecycleIndex;
+        //     }
+        //   });
+
+        //   return {
+        //     requestId: Number(request.id),
+        //     requestName: request.name,
+        //     buyerId: Number(request.buyerId),
+        //     sellersPriceQuote: Number(request.sellersPriceQuote),
+        //     lockedSellerId: Number(request.lockedSellerId),
+        //     description: request.description,
+        //     lifecycle,
+        //     longitude: Number(request.location.longitude.toString()),
+        //     latitude: Number(request.location.latitude.toString()),
+        //     createdAt: Number(request.createdAt.toString() / 1000),
+        //     updatedAt: Number(request.updatedAt.toString() / 1000),
+        //     images: request.images,
+        //   };
+        // });
+
+        // this.list = res;
+        // return res;
       } catch (error) {
         console.log({ error });
         throw error;
@@ -205,51 +201,46 @@ export const useRequestsStore = defineStore("requests", {
       try {
         const userStore = useUserStore();
         const contract = await userStore.getContract();
-        const api = await userStore.polkadotApi();
 
-        const { result, output } = await contract.query.getRequest(
-          userStore.accountId!,
-          {
-            gasLimit: api?.registry.createType("WeightV2", {
-              refTime: MAX_CALL_WEIGHT,
-              proofSize: PROOFSIZE,
-            }) as WeightV2,
-            storageDepositLimit,
+        const queryResult = await contract.queryContractSmart(env.contractId, {
+          get_request: {
+            request_id: requestId,
           },
-          requestId
-        );
+        });
 
-        if (result.isErr) {
-          throw new Error(result.asErr.toString());
-        } else {
-          const userInfo = output?.toJSON();
-          const userData = (userInfo as any)?.ok;
+        throw new Error("not implemented");
 
-          const lifecycle_ = userData.lifecycle.toUpperCase();
+        // if (result.isErr) {
+        //   throw new Error(result.asErr.toString());
+        // } else {
+        //   const userInfo = output?.toJSON();
+        //   const userData = (userInfo as any)?.ok;
 
-          let lifecycle: RequestLifecycleIndex = RequestLifecycleIndex.PENDING;
+        //   const lifecycle_ = userData.lifecycle.toUpperCase();
 
-          Object.entries(RequestLifecycleIndex).forEach(([key, value]) => {
-            if (key.replaceAll("_", "") === lifecycle_) {
-              lifecycle = value as RequestLifecycleIndex;
-            }
-          });
+        //   let lifecycle: RequestLifecycleIndex = RequestLifecycleIndex.PENDING;
 
-          return {
-            requestId: Number(userData.id),
-            requestName: userData.name,
-            buyerId: Number(userData.buyerId),
-            sellersPriceQuote: Number(userData.sellersPriceQuote),
-            lockedSellerId: Number(userData.lockedSellerId),
-            description: userData.description,
-            lifecycle,
-            longitude: Number(userData.location.longitude.toString()),
-            latitude: Number(userData.location.latitude.toString()),
-            createdAt: Number(userData.createdAt.toString() / 1000),
-            updatedAt: Number(userData.updatedAt.toString() / 1000),
-            images: userData.images,
-          };
-        }
+        //   Object.entries(RequestLifecycleIndex).forEach(([key, value]) => {
+        //     if (key.replaceAll("_", "") === lifecycle_) {
+        //       lifecycle = value as RequestLifecycleIndex;
+        //     }
+        //   });
+
+        //   return {
+        //     requestId: Number(userData.id),
+        //     requestName: userData.name,
+        //     buyerId: Number(userData.buyerId),
+        //     sellersPriceQuote: Number(userData.sellersPriceQuote),
+        //     lockedSellerId: Number(userData.lockedSellerId),
+        //     description: userData.description,
+        //     lifecycle,
+        //     longitude: Number(userData.location.longitude.toString()),
+        //     latitude: Number(userData.location.latitude.toString()),
+        //     createdAt: Number(userData.createdAt.toString() / 1000),
+        //     updatedAt: Number(userData.updatedAt.toString() / 1000),
+        //     images: userData.images,
+        //   };
+        // }
       } catch (error) {
         console.log(error);
         throw error;
@@ -280,55 +271,48 @@ export const useRequestsStore = defineStore("requests", {
       try {
         const userStore = useUserStore();
         const contract = await userStore.getContract();
-        const api = await userStore.polkadotApi();
 
-        const { result, output } = await contract.query.getAllRequests(
-          userStore.accountId!,
-          {
-            gasLimit: api?.registry.createType("WeightV2", {
-              refTime: MAX_CALL_WEIGHT,
-              proofSize: PROOFSIZE,
-            }) as WeightV2,
-            storageDepositLimit,
-          }
-        );
+        const queryResult = await contract.queryContractSmart(env.contractId, {
+          get_all_requests: {},
+        });
 
-        if (result.isErr) {
-          throw new Error(result.asErr.toString());
-        } else {
-          const userInfo = output?.toJSON();
-          const userData = (userInfo as any)?.ok;
-          const res: any = userData.map((request: any) => {
-            const lifecycle_ = request.lifecycle.toUpperCase();
+        throw new Error("not implemented");
+        // if (result.isErr) {
+        //   throw new Error(result.asErr.toString());
+        // } else {
+        //   const userInfo = output?.toJSON();
+        //   const userData = (userInfo as any)?.ok;
+        //   const res: any = userData.map((request: any) => {
+        //     const lifecycle_ = request.lifecycle.toUpperCase();
 
-            let lifecycle: RequestLifecycleIndex =
-              RequestLifecycleIndex.PENDING;
+        //     let lifecycle: RequestLifecycleIndex =
+        //       RequestLifecycleIndex.PENDING;
 
-            Object.entries(RequestLifecycleIndex).forEach(([key, value]) => {
-              if (key.replaceAll("_", "") === lifecycle_) {
-                lifecycle = value as RequestLifecycleIndex;
-              }
-            });
+        //     Object.entries(RequestLifecycleIndex).forEach(([key, value]) => {
+        //       if (key.replaceAll("_", "") === lifecycle_) {
+        //         lifecycle = value as RequestLifecycleIndex;
+        //       }
+        //     });
 
-            return {
-              requestId: Number(request.id),
-              requestName: request.name,
-              buyerId: Number(request.buyerId),
-              sellersPriceQuote: Number(request.sellersPriceQuote),
-              lockedSellerId: Number(request.lockedSellerId),
-              description: request.description,
-              lifecycle,
-              longitude: Number(request.location.longitude.toString()),
-              latitude: Number(request.location.latitude.toString()),
-              createdAt: Number(request.createdAt.toString() / 1000),
-              updatedAt: Number(request.updatedAt.toString() / 1000),
-              images: request.images,
-            };
-          });
+        //     return {
+        //       requestId: Number(request.id),
+        //       requestName: request.name,
+        //       buyerId: Number(request.buyerId),
+        //       sellersPriceQuote: Number(request.sellersPriceQuote),
+        //       lockedSellerId: Number(request.lockedSellerId),
+        //       description: request.description,
+        //       lifecycle,
+        //       longitude: Number(request.location.longitude.toString()),
+        //       latitude: Number(request.location.latitude.toString()),
+        //       createdAt: Number(request.createdAt.toString() / 1000),
+        //       updatedAt: Number(request.updatedAt.toString() / 1000),
+        //       images: request.images,
+        //     };
+        //   });
 
-          this.list = res;
-          return res;
-        }
+        //   this.list = res;
+        //   return res;
+        // }
       } catch (error) {
         console.log({ error });
         throw error;
@@ -388,46 +372,41 @@ export const useRequestsStore = defineStore("requests", {
       try {
         const userStore = useUserStore();
         const contract = await userStore.getContract();
-        const api = await userStore.polkadotApi();
 
-        const { result, output } = await contract.query.getOfferByRequest(
-          userStore.accountId!,
-          {
-            gasLimit: api?.registry.createType("WeightV2", {
-              refTime: MAX_CALL_WEIGHT,
-              proofSize: PROOFSIZE,
-            }) as WeightV2,
-            storageDepositLimit,
+        const queryResult = await contract.queryContractSmart(env.contractId, {
+          get_offers_by_request: {
+            request_id: requestId,
           },
-          requestId
-        );
+        });
 
-        if (result.isErr) {
-          throw new Error(result.asErr.toString());
-        } else {
-          const userInfo = output?.toJSON();
-          const userData = (userInfo as any)?.ok;
-          console.log(userData);
+        throw new Error("not implemented");
 
-          const res: any = userData.map((offer: any) => {
-            const offer_: Offer = {
-              id: Number(offer.id),
-              offerId: Number(offer.id),
-              price: Number(offer.price),
-              images: offer.images,
-              requestId: offer.requestId,
-              storeName: offer.storeName,
-              sellerId: offer.sellerId,
-              isAccepted: offer.isAccepted,
-              createdAt: new Date(Number(offer.createdAt)),
-              updatedAt: new Date(Number(offer.updatedAt)),
-            };
+        // if (result.isErr) {
+        //   throw new Error(result.asErr.toString());
+        // } else {
+        //   const userInfo = output?.toJSON();
+        //   const userData = (userInfo as any)?.ok;
+        //   console.log(userData);
 
-            return offer_;
-          });
+        //   const res: any = userData.map((offer: any) => {
+        //     const offer_: Offer = {
+        //       id: Number(offer.id),
+        //       offerId: Number(offer.id),
+        //       price: Number(offer.price),
+        //       images: offer.images,
+        //       requestId: offer.requestId,
+        //       storeName: offer.storeName,
+        //       sellerId: offer.sellerId,
+        //       isAccepted: offer.isAccepted,
+        //       createdAt: new Date(Number(offer.createdAt)),
+        //       updatedAt: new Date(Number(offer.updatedAt)),
+        //     };
 
-          return res;
-        }
+        //     return offer_;
+        //   });
+
+        //   return res;
+        // }
       } catch (error) {
         console.log({ error });
         throw error;
