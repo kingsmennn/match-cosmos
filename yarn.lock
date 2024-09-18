@@ -801,10 +801,10 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@keplr-wallet/types@^0.12.96":
-  version "0.12.127"
-  resolved "https://registry.npmjs.org/@keplr-wallet/types/-/types-0.12.127.tgz"
-  integrity sha512-U9oKmhx38lOBKUSsB0appFfeRX6yl540Ar0OEwnmuiHXj3vp+ELgWmFM/2T8tMOMQJvfoxhF8rKVoWniJICobA==
+"@keplr-wallet/types@0.12.126":
+  version "0.12.126"
+  resolved "https://registry.yarnpkg.com/@keplr-wallet/types/-/types-0.12.126.tgz#b5913cc46fe17658c959fc19bfd6653212ca1ba1"
+  integrity sha512-E7kLFz6ILLTavrIGuA0pstBwPCc5P8EyNDkCx+0qBRyD4vOVUumH64UHbhBc73OYwlTZ+VKN7wQsYkH9eH+qHQ==
   dependencies:
     long "^4.0.0"
 
