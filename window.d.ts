@@ -30,7 +30,6 @@ declare global {
     };
     ethereum?: Ethereum;
     solana?: Solana;
-    keplr?: Keplr;
     getOfflineSigner: any;
   }
 }
