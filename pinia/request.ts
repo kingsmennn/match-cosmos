@@ -124,74 +124,63 @@ export const useRequestsStore = defineStore("requests", {
       try {
         const userStore = useUserStore();
         const contract = await userStore.getContract();
-        const api = await userStore.polkadotApi();
 
-        const { result, output } = await contract.query.getSellerOffers(
-          accountId,
-          {
-            gasLimit: api?.registry.createType("WeightV2", {
-              refTime: MAX_CALL_WEIGHT,
-              proofSize: PROOFSIZE,
-            }) as WeightV2,
-            storageDepositLimit,
+        const queryResult = await contract.queryContractSmart(env.contractId, {
+          get_seller_offers: {
+            address: accountId,
           },
-          accountId
-        );
+        });
+        // if (result.isErr) {
+        //   throw new Error(result.asErr.toString());
+        // }
 
-        if (result.isErr) {
-          throw new Error(result.asErr.toString());
-        }
+        // const offersData = output?.toJSON();
 
-        const offersData = output?.toJSON();
+        // const offers = (offersData as any).ok;
 
-        const offers = (offersData as any).ok;
+        // const requests = [];
 
-        const requests = [];
+        // for (const offer of offers) {
+        //   const queryResult = await contract.queryContractSmart(
+        //     env.contractId,
+        //     {
+        //       get_request: {
+        //         request_id: offer.requestId,
+        //       },
+        //     }
+        //   );
 
-        for (const offer of offers) {
-          const { output: requestOutput } = await contract.query.getRequest(
-            accountId,
-            {
-              gasLimit: api?.registry.createType("WeightV2", {
-                refTime: MAX_CALL_WEIGHT,
-                proofSize: PROOFSIZE,
-              }) as WeightV2,
-              storageDepositLimit,
-            },
-            offer.requestId
-          );
+        //   const requestData = (requestOutput?.toJSON() as any).ok;
 
-          const requestData = (requestOutput?.toJSON() as any).ok;
+        //   if (requestData) {
+        //     const lifecycle_ = requestData.lifecycle.toUpperCase();
+        //     let lifecycle: RequestLifecycleIndex =
+        //       RequestLifecycleIndex.PENDING;
+        //     Object.entries(RequestLifecycleIndex).forEach(([key, value]) => {
+        //       if (key.replaceAll("_", "") === lifecycle_) {
+        //         lifecycle = value as RequestLifecycleIndex;
+        //       }
+        //     });
 
-          if (requestData) {
-            const lifecycle_ = requestData.lifecycle.toUpperCase();
-            let lifecycle: RequestLifecycleIndex =
-              RequestLifecycleIndex.PENDING;
-            Object.entries(RequestLifecycleIndex).forEach(([key, value]) => {
-              if (key.replaceAll("_", "") === lifecycle_) {
-                lifecycle = value as RequestLifecycleIndex;
-              }
-            });
+        //     requests.push({
+        //       requestId: Number(requestData.id),
+        //       requestName: requestData.name,
+        //       buyerId: Number(requestData.buyerId),
+        //       sellersPriceQuote: Number(requestData.sellersPriceQuote),
+        //       lockedSellerId: Number(requestData.lockedSellerId),
+        //       description: requestData.description,
+        //       lifecycle,
+        //       longitude: Number(requestData.location.longitude.toString()),
+        //       latitude: Number(requestData.location.latitude.toString()),
+        //       createdAt: Number(requestData.createdAt.toString() / 1000),
+        //       updatedAt: Number(requestData.updatedAt.toString() / 1000),
+        //       images: requestData.images,
+        //     });
+        //   }
+        // }
 
-            requests.push({
-              requestId: Number(requestData.id),
-              requestName: requestData.name,
-              buyerId: Number(requestData.buyerId),
-              sellersPriceQuote: Number(requestData.sellersPriceQuote),
-              lockedSellerId: Number(requestData.lockedSellerId),
-              description: requestData.description,
-              lifecycle,
-              longitude: Number(requestData.location.longitude.toString()),
-              latitude: Number(requestData.location.latitude.toString()),
-              createdAt: Number(requestData.createdAt.toString() / 1000),
-              updatedAt: Number(requestData.updatedAt.toString() / 1000),
-              images: requestData.images,
-            });
-          }
-        }
-
-        this.list = requests;
-        return requests;
+        // this.list = requests;
+        // return requests;
       } catch (error) {
         console.error("Error fetching seller requests:", error);
         throw error;
