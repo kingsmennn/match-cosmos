@@ -81,11 +81,11 @@ export const useUserStore = defineStore(STORE_KEY, {
     },
     async connectToCosmos() {
       try {
-        const keplr = window.keplr;
-        await keplr.experimentalSuggestChain(cosmosChainInfo);
-        if (!window.getOfflineSigner || !window.keplr) {
+        if (!window.keplr) {
           throw new Error("Keplr extension not installed");
         }
+        const keplr = window.keplr;
+        await keplr.experimentalSuggestChain(cosmosChainInfo);
         await window.keplr.enable(cosmosChainInfo.chainId);
 
         const offlineSigner = window.getOfflineSigner(cosmosChainInfo.chainId);
@@ -112,8 +112,8 @@ export const useUserStore = defineStore(STORE_KEY, {
       }
     },
     async getContract() {
-      const api = await this.polkadotApi();
-      return new ContractPromise(api as ApiPromise, marketAbi, env.contractId);
+      const api = await this.cosmosApi();
+      return api;
     },
 
     async disconnect() {
@@ -136,41 +136,35 @@ export const useUserStore = defineStore(STORE_KEY, {
       const contract = await this.getContract();
 
       try {
-        const api = await this.cosmosApi();
-        const gasLimit = api?.registry.createType("WeightV2", {
-          refTime: MAX_CALL_WEIGHT,
-          proofSize: PROOFSIZE,
-        }) as WeightV2;
-        const { result, output } = await contract.query.getUser(
-          account_id,
-          {
-            gasLimit,
-            storageDepositLimit,
+        const queryResult = await contract.queryContractSmart(env.contractId, {
+          get_user: {
+            account_id,
           },
-          account_id
-        );
-        if (result.isErr) {
-          throw new Error(result.asErr.toString());
-        } else {
-          const userInfo = output?.toJSON();
-          const userData = (userInfo as any)?.ok;
+        });
 
-          const results = [
-            Number(userData.id),
-            userData.username,
-            userData.phone,
-            [
-              Number(userData.location.longitude),
-              Number(userData.location.latitude),
-            ],
-            Number(userData.createdAt),
-            Number(userData.updatedAt),
-            Number(
-              userData.accountType.toLowerCase() === AccountType.BUYER ? 0 : 1
-            ),
-          ];
-          return results;
-        }
+        throw new Error("Not implemented");
+        // if (result.isErr) {
+        //   throw new Error(result.asErr.toString());
+        // } else {
+        // const userInfo = output?.toJSON();
+        // const userData = (userInfo as any)?.ok;
+
+        // const results = [
+        //   Number(userData.id),
+        //   userData.username,
+        //   userData.phone,
+        //   [
+        //     Number(userData.location.longitude),
+        //     Number(userData.location.latitude),
+        //   ],
+        //   Number(userData.createdAt),
+        //   Number(userData.updatedAt),
+        //   Number(
+        //     userData.accountType.toLowerCase() === AccountType.BUYER ? 0 : 1
+        //   ),
+        // ];
+        // return results;
+        // }
       } catch (error) {
         console.log({ error });
         return [0, "", "", [0, 0], 0, 0, 0];
