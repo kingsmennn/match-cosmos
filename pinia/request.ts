@@ -7,16 +7,15 @@ import {
   RequestResponse,
 } from "@/types";
 
-import {
-  storageDepositLimit,
-  useUserStore,
-} from "./user";
+import { storageDepositLimit, useUserStore } from "./user";
 import { MAX_CALL_WEIGHT, PROOFSIZE } from "@/utils/constants";
 
 import { BN, BN_ONE } from "@polkadot/util";
 import { web3FromAddress } from "@polkadot/extension-dapp";
 import type { WeightV2 } from "@polkadot/types/interfaces";
 import { getPolkadotContractResult } from "@/utils/contract-utils";
+
+const env = useRuntimeConfig().public;
 type RequestsStoreType = {
   list: RequestResponse[];
 };
@@ -45,59 +44,22 @@ export const useRequestsStore = defineStore("requests", {
       const userStore = useUserStore();
 
       try {
-        const injector = await web3FromAddress(userStore.accountId!);
-        const api = await userStore.polkadotApi();
         const contract = await userStore.getContract();
 
-        const { gasRequired } = await contract.query.createRequest(
+        const result = await contract.execute(
           userStore.accountId!,
+          env.contractId,
           {
-            gasLimit: api?.registry.createType("WeightV2", {
-              refTime: MAX_CALL_WEIGHT,
-              proofSize: PROOFSIZE,
-            }) as WeightV2,
-            storageDepositLimit,
-          },
-          name,
-          description,
-          [...images],
-          new BN(Math.trunc(latitude).toString()),
-          new BN(Math.trunc(longitude).toString())
-        );
-        const result = await new Promise(async (resolve, reject) => {
-          const requestData = await contract.tx
-            .createRequest(
-              {
-                gasLimit: api?.registry.createType(
-                  "WeightV2",
-                  gasRequired
-                ) as WeightV2,
-                storageDepositLimit,
-              },
+            create_request: {
               name,
               description,
-              [...images],
-              new BN(Math.trunc(latitude).toString()),
-              new BN(Math.trunc(longitude).toString())
-            )
-            .signAndSend(
-              userStore.accountId!,
-              { signer: injector.signer },
-              (result) => {
-                try {
-                  const success = getPolkadotContractResult({
-                    result,
-                    api: api!,
-                  });
-                  if (success) {
-                    resolve(requestData);
-                  }
-                } catch (error) {
-                  reject(error);
-                }
-              }
-            );
-        });
+              images: [...images],
+              latitude: new BN(Math.trunc(latitude).toString()),
+              longitude: new BN(Math.trunc(longitude).toString()),
+            },
+          },
+          "auto"
+        );
 
         return result;
       } catch (error) {
@@ -381,57 +343,21 @@ export const useRequestsStore = defineStore("requests", {
       const userStore = useUserStore();
 
       try {
-        const injector = await web3FromAddress(userStore.accountId!);
-        const api = await userStore.polkadotApi();
         const contract = await userStore.getContract();
 
-        const { gasRequired } = await contract.query.createOffer(
+        const result = await contract.execute(
           userStore.accountId!,
+          env.contractId,
           {
-            gasLimit: api?.registry.createType("WeightV2", {
-              refTime: MAX_CALL_WEIGHT,
-              proofSize: PROOFSIZE,
-            }) as WeightV2,
-            storageDepositLimit,
-          },
-          requestId,
-          price,
-          [...images],
-          storeName
-        );
-        const result = await new Promise(async (resolve, reject) => {
-          const offerResult = await contract.tx
-            .createOffer(
-              {
-                gasLimit: api?.registry.createType(
-                  "WeightV2",
-                  gasRequired
-                ) as WeightV2,
-                storageDepositLimit,
-              },
-              requestId,
+            create_offer: {
+              request_id: requestId,
               price,
-              [...images],
-              storeName
-            )
-            .signAndSend(
-              userStore.accountId!,
-              { signer: injector.signer },
-              (result) => {
-                try {
-                  const success = getPolkadotContractResult({
-                    result,
-                    api: api!,
-                  });
-                  if (success) {
-                    resolve(offerResult);
-                  }
-                } catch (error) {
-                  reject(error);
-                }
-              }
-            );
-        });
+              images: [...images],
+              store_name: storeName,
+            },
+          },
+          "auto"
+        );
 
         return result;
       } catch (error) {
@@ -442,52 +368,16 @@ export const useRequestsStore = defineStore("requests", {
     async acceptOffer(offerId: number): Promise<any | undefined> {
       const userStore = useUserStore();
       try {
-        const injector = await web3FromAddress(userStore.accountId!);
-        const api = await userStore.polkadotApi();
         const contract = await userStore.getContract();
 
-        const { gasRequired } = await contract.query.acceptOffer(
+        const result = await contract.execute(
           userStore.accountId!,
+          env.contractId,
           {
-            gasLimit: api?.registry.createType("WeightV2", {
-              refTime: MAX_CALL_WEIGHT,
-              proofSize: PROOFSIZE,
-            }) as WeightV2,
-            storageDepositLimit,
+            accept_offer: { offer_id: offerId },
           },
-          offerId
+          "auto"
         );
-        const result = await new Promise(async (resolve, reject) => {
-          const acceptOfferRes = await contract.tx
-            .acceptOffer(
-              {
-                gasLimit: api?.registry.createType(
-                  "WeightV2",
-                  gasRequired
-                ) as WeightV2,
-                storageDepositLimit,
-              },
-              offerId
-            )
-            .signAndSend(
-              userStore.accountId!,
-              { signer: injector.signer },
-              (result) => {
-                try {
-                  const success = getPolkadotContractResult({
-                    result,
-                    api: api!,
-                  });
-                  if (success) {
-                    resolve(acceptOfferRes);
-                  }
-                } catch (error) {
-                  reject(error);
-                }
-              }
-            );
-        });
-
         return result;
       } catch (error) {
         console.error(error);
@@ -546,52 +436,16 @@ export const useRequestsStore = defineStore("requests", {
     async markRequestAsCompleted(requestId: number) {
       try {
         const userStore = useUserStore();
-        const injector = await web3FromAddress(userStore.accountId!);
-        const api = await userStore.polkadotApi();
         const contract = await userStore.getContract();
 
-        const { gasRequired } = await contract.query.markRequestAsCompleted(
+        const result = await contract.execute(
           userStore.accountId!,
+          env.contractId,
           {
-            gasLimit: api?.registry.createType("WeightV2", {
-              refTime: MAX_CALL_WEIGHT,
-              proofSize: PROOFSIZE,
-            }) as WeightV2,
-            storageDepositLimit,
+            mark_request_as_completed: { request_id: requestId },
           },
-          requestId
+          "auto"
         );
-
-        const result = await new Promise(async (resolve, reject) => {
-          const markResult = await contract.tx
-            .markRequestAsCompleted(
-              {
-                gasLimit: api?.registry.createType(
-                  "WeightV2",
-                  gasRequired
-                ) as WeightV2,
-                storageDepositLimit,
-              },
-              requestId
-            )
-            .signAndSend(
-              userStore.accountId!,
-              { signer: injector.signer },
-              (result) => {
-                try {
-                  const success = getPolkadotContractResult({
-                    result,
-                    api: api!,
-                  });
-                  if (success) {
-                    resolve(markResult);
-                  }
-                } catch (error) {
-                  reject(error);
-                }
-              }
-            );
-        });
 
         return result;
       } catch (error) {
@@ -602,51 +456,16 @@ export const useRequestsStore = defineStore("requests", {
     async deleteRequest(requestId: number) {
       try {
         const userStore = useUserStore();
-        const injector = await web3FromAddress(userStore.accountId!);
-        const api = await userStore.polkadotApi();
         const contract = await userStore.getContract();
 
-        const { gasRequired } = await contract.query.deleteRequest(
+        const result = await contract.execute(
           userStore.accountId!,
+          env.contractId,
           {
-            gasLimit: api?.registry.createType("WeightV2", {
-              refTime: MAX_CALL_WEIGHT,
-              proofSize: PROOFSIZE,
-            }) as WeightV2,
-            storageDepositLimit,
+            delete_request: { request_id: requestId },
           },
-          requestId
+          "auto"
         );
-        const result = await new Promise(async (resolve, reject) => {
-          const deleteRequest = await contract.tx
-            .deleteRequest(
-              {
-                gasLimit: api?.registry.createType(
-                  "WeightV2",
-                  gasRequired
-                ) as WeightV2,
-                storageDepositLimit,
-              },
-              requestId
-            )
-            .signAndSend(
-              userStore.accountId!,
-              { signer: injector.signer },
-              (result) => {
-                try {
-                  const success = getPolkadotContractResult({
-                    result,
-                    api: api!,
-                  });
-                  if (success) {
-                    resolve(deleteRequest);
-                  }
-                } catch (error) {
-                  reject(error);
-                }
-              }
-            );
-        });
 
         return result;
       } catch (error) {

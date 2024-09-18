@@ -38,7 +38,7 @@ type UserStore = {
   locationEnabled: boolean;
 };
 
-const env = useRuntimeConfig().public;
+export const env = useRuntimeConfig().public;
 
 export const storageDepositLimit = null;
 let apiInstance: SigningCosmWasmClient | null = null;
