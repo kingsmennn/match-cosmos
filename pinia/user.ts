@@ -313,7 +313,7 @@ export const useUserStore = defineStore(STORE_KEY, {
           this.accountId!,
           env.contractId,
           {
-            toggle_location_preference: {
+            toggle_location: {
               enabled: value,
             },
           },
