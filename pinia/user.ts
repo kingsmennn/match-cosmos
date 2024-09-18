@@ -226,58 +226,20 @@ export const useUserStore = defineStore(STORE_KEY, {
     }: CreateUserDTO): Promise<string | undefined> {
       try {
         const contract = await this.getContract();
-        const injector = await web3FromAddress(this.accountId!);
-        const api = await this.polkadotApi();
-        const { gasRequired } = await contract.query.createUser(
+        const result = await contract.execute(
           this.accountId!,
+          env.contractId,
           {
-            gasLimit: api?.registry.createType("WeightV2", {
-              refTime: MAX_CALL_WEIGHT,
-              proofSize: PROOFSIZE,
-            }) as WeightV2,
-            storageDepositLimit,
-          },
-          username,
-          phone,
-          lat,
-          long,
-          account_type == AccountType.BUYER ? 0 : 1
-        );
-
-        await new Promise(async (resolve, reject) => {
-          await contract.tx
-            .createUser(
-              {
-                gasLimit: api?.registry.createType(
-                  "WeightV2",
-                  gasRequired
-                ) as WeightV2,
-                storageDepositLimit,
-              },
+            create_user: {
               username,
               phone,
               lat,
               long,
-              account_type == AccountType.BUYER ? 0 : 1
-            )
-            .signAndSend(
-              this.accountId!,
-              { signer: injector.signer },
-              (result) => {
-                try {
-                  const success = getPolkadotContractResult({
-                    result,
-                    api: api!,
-                  });
-                  if (success) {
-                    resolve(success);
-                  }
-                } catch (error) {
-                  reject(error);
-                }
-              }
-            );
-        });
+              account_type,
+            },
+          },
+          "auto"
+        );
 
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
@@ -320,59 +282,20 @@ export const useUserStore = defineStore(STORE_KEY, {
           account_type: account_type == AccountType.BUYER ? 0 : 1,
         };
 
-        const api = await this.polkadotApi();
-
-        const { gasRequired } = await contract.query.updateUser(
+        const result = await contract.execute(
           this.accountId!,
+          env.contractId,
           {
-            gasLimit: api?.registry.createType("WeightV2", {
-              refTime: MAX_CALL_WEIGHT,
-              proofSize: PROOFSIZE,
-            }) as WeightV2,
-            storageDepositLimit,
+            update_user: {
+              username: payload.username,
+              phone: payload.phone,
+              lat: payload.lat,
+              long: payload.lng,
+              account_type: payload.account_type,
+            },
           },
-          payload.username,
-          payload.phone,
-          payload.lat,
-          payload.lng,
-          payload.account_type
+          "auto"
         );
-
-        const injector = await web3FromAddress(this.accountId!);
-        await new Promise(async (resolve, reject) => {
-          await contract.tx
-            .updateUser(
-              {
-                gasLimit: api?.registry.createType(
-                  "WeightV2",
-                  gasRequired
-                ) as WeightV2,
-                storageDepositLimit,
-              },
-              payload.username,
-              payload.phone,
-              payload.lat,
-              payload.lng,
-              payload.account_type
-            )
-            .signAndSend(
-              this.accountId!,
-              { signer: injector.signer },
-              (result) => {
-                try {
-                  const success = getPolkadotContractResult({
-                    result,
-                    api: api!,
-                  });
-                  if (success) {
-                    resolve(success);
-                  }
-                } catch (error) {
-                  reject(error);
-                }
-              }
-            );
-        });
 
         return {
           tx: "",
@@ -386,52 +309,16 @@ export const useUserStore = defineStore(STORE_KEY, {
     async toggleEnableLocation(value: boolean) {
       try {
         const contract = await this.getContract();
-        const api = await this.polkadotApi();
-
-        const { gasRequired } = await contract.query.toggleLocation(
+        const result = await contract.execute(
           this.accountId!,
+          env.contractId,
           {
-            gasLimit: api?.registry.createType("WeightV2", {
-              refTime: MAX_CALL_WEIGHT,
-              proofSize: PROOFSIZE,
-            }) as WeightV2,
-            storageDepositLimit,
+            toggle_location_preference: {
+              enabled: value,
+            },
           },
-          value
+          "auto"
         );
-
-        const injector = await web3FromAddress(this.accountId!);
-        await new Promise(async (resolve, reject) => {
-          await contract.tx
-            .toggleLocation(
-              {
-                gasLimit: api?.registry.createType(
-                  "WeightV2",
-                  gasRequired
-                ) as WeightV2,
-                storageDepositLimit,
-              },
-              value
-            )
-            .signAndSend(
-              this.accountId!,
-              { signer: injector.signer },
-              (result) => {
-                try {
-                  const success = getPolkadotContractResult({
-                    result,
-                    api: api!,
-                  });
-                  if (success) {
-                    this.locationEnabled = value;
-                    resolve(success);
-                  }
-                } catch (error) {
-                  reject(error);
-                }
-              }
-            );
-        });
       } catch (error) {
         console.error("Error updating user:", error);
         throw error;
@@ -440,25 +327,11 @@ export const useUserStore = defineStore(STORE_KEY, {
     async fetchLocationPreference(): Promise<boolean> {
       try {
         const contract = await this.getContract();
-        const api = await this.polkadotApi();
+        const queryResult = await contract.queryContractSmart(env.contractId, {
+          get_location_preference: {},
+        });
 
-        const { result, output } = await contract.query.getLocationPreference(
-          this.accountId!,
-          {
-            gasLimit: api?.registry.createType("WeightV2", {
-              refTime: MAX_CALL_WEIGHT,
-              proofSize: PROOFSIZE,
-            }) as WeightV2,
-            storageDepositLimit,
-          }
-        );
-        if (result.isErr) {
-          throw new Error(result.asErr.toString());
-        }
-        const locPreferenceInfo = output?.toJSON();
-        const locPreferenceData = (locPreferenceInfo as any)?.ok;
-
-        return locPreferenceData;
+        return true;
       } catch (error) {
         console.error("Error fetching location preference:", error);
         throw error;
