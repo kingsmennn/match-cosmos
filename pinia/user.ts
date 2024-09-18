@@ -11,7 +11,7 @@ import {
 } from "@/types";
 import { cosmosConfig, LOCATION_DECIMALS } from "@/utils/constants";
 import { useStoreStore } from "./store";
-
+import { SigningCosmWasmClient, setupWebKeplr } from "cosmwasm";
 import { marketAbi } from "@/blockchain/abi";
 import { connectExtension } from "@/utils/connect_web3";
 import { BN, BN_ONE } from "@polkadot/util";
@@ -26,8 +26,6 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 
 import { ContractPromise } from "@polkadot/api-contract";
 import { getPolkadotContractResult } from "@/utils/contract-utils";
-
-import { setupWebKeplr } from "cosmwasm";
 
 type UserStore = {
   accountId: string | null;
@@ -83,7 +81,27 @@ export const useUserStore = defineStore(STORE_KEY, {
     },
     async connectToCosmos() {
       try {
-        const client = await setupWebKeplr(cosmosConfig);
+        const keplr = window.keplr;
+        await keplr.experimentalSuggestChain(cosmosChainInfo);
+        if (!window.getOfflineSigner || !window.keplr) {
+          alert("Please install Keplr extension");
+        } else {
+          await window.keplr.enable(cosmosChainInfo.chainId);
+
+          const offlineSigner = window.getOfflineSigner(
+            cosmosChainInfo.chainId
+          );
+
+          const accounts = await offlineSigner.getAccounts();
+
+          console.log("Connected Account: ", accounts[0].address);
+
+          const client = await SigningCosmWasmClient.connectWithSigner(
+            cosmosChainInfo.rpc,
+            offlineSigner
+          );
+        }
+
         const accounts = await connectExtension();
         this.accountId = accounts![0].address;
 

@@ -26,6 +26,7 @@
     "@vueuse/core": "^11.0.0",
     "@vueuse/integrations": "^11.0.0",
     "cosmwasm": "^1.1.1",
+    "@keplr-wallet/types": "^0.12.96",
     "moment": "^2.29.4",
     "nuxt-vuefire": "^0.2.13",
     "random-word-slugs": "^0.1.7",
