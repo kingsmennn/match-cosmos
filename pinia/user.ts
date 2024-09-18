@@ -140,7 +140,7 @@ export const useUserStore = defineStore(STORE_KEY, {
       try {
         const queryResult = await contract.queryContractSmart(env.contractId, {
           get_user: {
-            account_id,
+            address: account_id,
           },
         });
 
@@ -328,7 +328,9 @@ export const useUserStore = defineStore(STORE_KEY, {
       try {
         const contract = await this.getContract();
         const queryResult = await contract.queryContractSmart(env.contractId, {
-          get_location_preference: {},
+          get_location_preference: {
+            address: this.accountId!,
+          },
         });
 
         return true;
