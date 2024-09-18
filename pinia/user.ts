@@ -85,6 +85,7 @@ export const useUserStore = defineStore(STORE_KEY, {
           throw new Error("Keplr extension not installed");
         }
         const keplr = window.keplr;
+
         await keplr.experimentalSuggestChain(cosmosChainInfo);
 
         await keplr.enable(cosmosChainInfo.chainId);

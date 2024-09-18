@@ -1,9 +1,9 @@
 // global.d.ts or window.d.ts
-// import {
-//   ChainInfoWithoutEndpoints,
-//   Keplr,
-//   Window as KeplrWindow,
-// } from "@keplr-wallet/types";
+import type {
+  ChainInfoWithoutEndpoints,
+  Keplr as KeplrType,
+  Window as KeplrWindow,
+} from "@keplr-wallet/types";
 
 interface Ethereum {
   isMetaMask?: boolean;
@@ -19,13 +19,18 @@ interface Solana {
   publicKey: string;
 }
 
-export interface Keplr {
-  readonly version: string;
-}
-
-interface Window {
-  ethereum?: Ethereum;
-  solana?: Solana;
-  keplr?: Keplr;
-  getOfflineSigner: any;
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface Window extends KeplrWindow {
+    keplr?: Keplr & {
+      ethereum: any;
+      getChainInfoWithoutEndpoints: (
+        chainId: string
+      ) => Promise<ChainInfoWithoutEndpoints>;
+    };
+    ethereum?: Ethereum;
+    solana?: Solana;
+    keplr?: Keplr;
+    getOfflineSigner: any;
+  }
 }
