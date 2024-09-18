@@ -1,9 +1,7 @@
 import { defineStore } from "pinia";
 import { CreateStoreDTO, Store, STORE_STORE_KEY } from "@/types";
-import { storageDepositLimit, useUserStore } from "./user";
-import { MAX_CALL_WEIGHT, PROOFSIZE } from "@/utils/constants";
+import { useUserStore } from "./user";
 import { LOCATION_DECIMALS } from "@/utils/constants";
-import { getPolkadotContractResult } from "@/utils/contract-utils";
 import BN from "bn.js";
 const env = useRuntimeConfig().public;
 

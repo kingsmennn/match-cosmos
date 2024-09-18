@@ -1,5 +1,4 @@
 export const chainName = "Sepolia";
-import { BN, BN_ONE } from "@polkadot/util";
 const env = useRuntimeConfig().public;
 
 const chains: {
@@ -44,9 +43,7 @@ export const appMetaData = {
   url: window.location.origin,
 };
 
-export const TIME_TILL_LOCK = 15 * 60 * 1000; // mss
-export const MAX_CALL_WEIGHT = new BN(5_000_000_000_000).isub(BN_ONE);
-export const PROOFSIZE = new BN(1_000_000);
+export const TIME_TILL_LOCK = 15 * 60 * 1000;
 
 export const cosmosConfig = {
   chainId: "theta-testnet-001",

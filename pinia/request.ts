@@ -1,17 +1,9 @@
 import { defineStore } from "pinia";
-import {
-  CreateOfferDTO,
-  CreateRequestDTO,
-  Offer,
-  RequestLifecycleIndex,
-  RequestResponse,
-} from "@/types";
+import { CreateOfferDTO, CreateRequestDTO, RequestResponse } from "@/types";
 
 import BN from "bn.js";
 
-import { storageDepositLimit, useUserStore } from "./user";
-import { MAX_CALL_WEIGHT, PROOFSIZE } from "@/utils/constants";
-import { getPolkadotContractResult } from "@/utils/contract-utils";
+import { useUserStore } from "./user";
 
 const env = useRuntimeConfig().public;
 type RequestsStoreType = {

@@ -9,14 +9,10 @@ import {
   Location,
   Store,
 } from "@/types";
-import { cosmosConfig, LOCATION_DECIMALS } from "@/utils/constants";
+import { LOCATION_DECIMALS } from "@/utils/constants";
 import { useStoreStore } from "./store";
-import { SigningCosmWasmClient, setupWebKeplr } from "cosmwasm";
-import { marketAbi } from "@/blockchain/abi";
-import { connectExtension } from "@/utils/connect_web3";
-import { MAX_CALL_WEIGHT, PROOFSIZE } from "@/utils/constants";
+import { SigningCosmWasmClient } from "cosmwasm";
 import BN from "bn.js";
-import { getPolkadotContractResult } from "@/utils/contract-utils";
 
 type UserStore = {
   accountId: string | null;
