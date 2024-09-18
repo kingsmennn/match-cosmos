@@ -41,7 +41,7 @@ type UserStore = {
 const env = useRuntimeConfig().public;
 
 export const storageDepositLimit = null;
-let apiInstance: ApiPromise | null = null;
+let apiInstance: SigningCosmWasmClient | null = null;
 
 export const useUserStore = defineStore(STORE_KEY, {
   state: (): UserStore => ({
@@ -84,25 +84,14 @@ export const useUserStore = defineStore(STORE_KEY, {
         const keplr = window.keplr;
         await keplr.experimentalSuggestChain(cosmosChainInfo);
         if (!window.getOfflineSigner || !window.keplr) {
-          alert("Please install Keplr extension");
-        } else {
-          await window.keplr.enable(cosmosChainInfo.chainId);
-
-          const offlineSigner = window.getOfflineSigner(
-            cosmosChainInfo.chainId
-          );
-
-          const accounts = await offlineSigner.getAccounts();
-
-          console.log("Connected Account: ", accounts[0].address);
-
-          const client = await SigningCosmWasmClient.connectWithSigner(
-            cosmosChainInfo.rpc,
-            offlineSigner
-          );
+          throw new Error("Keplr extension not installed");
         }
+        await window.keplr.enable(cosmosChainInfo.chainId);
 
-        const accounts = await connectExtension();
+        const offlineSigner = window.getOfflineSigner(cosmosChainInfo.chainId);
+
+        const accounts = await offlineSigner.getAccounts();
+
         this.accountId = accounts![0].address;
 
         const blockchainUser = await this.fetchUser(this.accountId);
@@ -147,7 +136,7 @@ export const useUserStore = defineStore(STORE_KEY, {
       const contract = await this.getContract();
 
       try {
-        const api = await this.polkadotApi();
+        const api = await this.cosmosApi();
         const gasLimit = api?.registry.createType("WeightV2", {
           refTime: MAX_CALL_WEIGHT,
           proofSize: PROOFSIZE,
@@ -542,27 +531,14 @@ export const useUserStore = defineStore(STORE_KEY, {
         throw error;
       }
     },
-
-    async polkadotApi() {
-      if (apiInstance) {
-        return apiInstance;
-      }
-
-      const wsProvider = new WsProvider(env.polkadotRpcUrl);
-      apiInstance = await ApiPromise.create({
-        provider: wsProvider,
-      });
-      return apiInstance;
-    },
     async cosmosApi() {
       if (apiInstance) {
         return apiInstance;
       }
-
-      const wsProvider = new WsProvider(env.polkadotRpcUrl);
-      apiInstance = await ApiPromise.create({
-        provider: wsProvider,
-      });
+      apiInstance = await SigningCosmWasmClient.connectWithSigner(
+        cosmosChainInfo.rpc,
+        window.getOfflineSigner(cosmosChainInfo.chainId)
+      );
       return apiInstance;
     },
 
