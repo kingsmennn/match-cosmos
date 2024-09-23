@@ -11,7 +11,7 @@ import {
 } from "@/types";
 import { LOCATION_DECIMALS } from "@/utils/constants";
 import { useStoreStore } from "./store";
-import { SigningCosmWasmClient } from "cosmwasm";
+import { Decimal, SigningCosmWasmClient } from "cosmwasm";
 import BN from "bn.js";
 
 type UserStore = {
@@ -220,8 +220,8 @@ export const useUserStore = defineStore(STORE_KEY, {
             create_user: {
               username,
               phone,
-              lat,
-              long,
+              latitude: lat.toString(),
+              longitude: long.toString(),
               account_type,
             },
           },
@@ -278,7 +278,7 @@ export const useUserStore = defineStore(STORE_KEY, {
               phone: payload.phone,
               lat: payload.lat,
               long: payload.lng,
-              account_type: payload.account_type,
+              account_type,
             },
           },
           "auto"
@@ -389,7 +389,13 @@ export const useUserStore = defineStore(STORE_KEY, {
       }
       apiInstance = await SigningCosmWasmClient.connectWithSigner(
         cosmosChainInfo.rpc,
-        window.getOfflineSigner(cosmosChainInfo.chainId)
+        window.getOfflineSigner(cosmosChainInfo.chainId),
+        {
+          gasPrice: {
+            amount: Decimal.fromUserInput("0.025", 6), // Amount of gas price
+            denom: "uatom", // Denomination of the token used for fees (example for Cosmos)
+          },
+        }
       );
       return apiInstance;
     },

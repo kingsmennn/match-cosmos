@@ -1,6 +1,6 @@
 export enum AccountType {
-  BUYER = 'buyer',
-  SELLER = 'seller'
+  BUYER = "Buyer",
+  SELLER = "Seller",
 }
 
 export type Location = [
@@ -22,10 +22,10 @@ export type User = {
   stores?: Store[];
 };
 export type Store = {
-  id?: number
+  id?: number;
   name: string;
   description?: string;
-  phone: string
+  phone: string;
   location: Location;
 };
 
@@ -62,29 +62,29 @@ export type Request = {
 };
 
 export type RequestResponse = {
-  _id?: string
-  transactionHash?: string
-  address?: string
-  buyerAddress?: string
-  images: string[]
-  lifecycle: RequestLifecycleIndex
-  requestId: number
-  signature?: string
-  createdAt: number
-  updatedAt: number
-  buyerId: number
-  description: string
-  requestName: string
-  sellerIds?: number[]
-  lockedSellerId?: number
-  longitude: number
-  latitude: number
-  sellersPriceQuote?: number
-}
+  _id?: string;
+  transactionHash?: string;
+  address?: string;
+  buyerAddress?: string;
+  images: string[];
+  lifecycle: RequestLifecycleIndex;
+  requestId: number;
+  signature?: string;
+  createdAt: number;
+  updatedAt: number;
+  buyerId: number;
+  description: string;
+  requestName: string;
+  sellerIds?: number[];
+  lockedSellerId?: number;
+  longitude: number;
+  latitude: number;
+  sellersPriceQuote?: number;
+};
 
 export type Offer = {
   id?: number;
-  offerId?: number
+  offerId?: number;
   price: number;
   images: string[];
   requestId: number;
@@ -122,7 +122,7 @@ export type BlockchainUser = [
 export type CreateStoreDTO = {
   name: string;
   description: string;
-  phone: string
+  phone: string;
   latitude: number;
   longitude: number;
 };
@@ -145,4 +145,4 @@ export type CreateOfferDTO = {
 export const STORE_KEY = "@userStore";
 export const STORE_KEY_MIDDLEWARE = "@userStoreMiddleware";
 
-export const STORE_STORE_KEY = '@StoreStore'
+export const STORE_STORE_KEY = "@StoreStore";
