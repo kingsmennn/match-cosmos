@@ -35,8 +35,8 @@ export const useStoreStore = defineStore(STORE_STORE_KEY, {
               name,
               description,
               phone,
-              latitude: lat,
-              longitude: long,
+              latitude: lat.toString(),
+              longitude: long.toString(),
             },
           },
           "auto"
@@ -66,6 +66,8 @@ export const useStoreStore = defineStore(STORE_STORE_KEY, {
             address: accountId,
           },
         });
+
+        return queryResult;
 
         throw new Error("not implemented");
 

@@ -125,35 +125,26 @@ export const useUserStore = defineStore(STORE_KEY, {
       const contract = await this.getContract();
 
       try {
-        const queryResult = await contract.queryContractSmart(env.contractId, {
+        const userData = await contract.queryContractSmart(env.contractId, {
           get_user: {
             address: account_id,
           },
         });
 
-        throw new Error("Not implemented");
-        // if (result.isErr) {
-        //   throw new Error(result.asErr.toString());
-        // } else {
-        // const userInfo = output?.toJSON();
-        // const userData = (userInfo as any)?.ok;
+        const results = [
+          Number(userData.id),
+          userData.username,
+          userData.phone,
+          [
+            Number(userData.location.longitude),
+            Number(userData.location.latitude),
+          ],
+          Number(userData.created_at),
+          Number(userData.updated_at),
+          Number(userData.account_type === AccountType.BUYER ? 0 : 1),
+        ];
 
-        // const results = [
-        //   Number(userData.id),
-        //   userData.username,
-        //   userData.phone,
-        //   [
-        //     Number(userData.location.longitude),
-        //     Number(userData.location.latitude),
-        //   ],
-        //   Number(userData.createdAt),
-        //   Number(userData.updatedAt),
-        //   Number(
-        //     userData.accountType.toLowerCase() === AccountType.BUYER ? 0 : 1
-        //   ),
-        // ];
-        // return results;
-        // }
+        return results;
       } catch (error) {
         console.log({ error });
         return [0, "", "", [0, 0], 0, 0, 0];
@@ -256,16 +247,12 @@ export const useUserStore = defineStore(STORE_KEY, {
         const payload = {
           username: username || this.userDetails?.[1],
           phone: phone || this.userDetails?.[2],
-          lat: new BN(
-            Math.trunc(
-              (lat || this.userDetails?.[3][1]!) * 10 ** LOCATION_DECIMALS
-            ).toString()
-          ),
-          lng: new BN(
-            Math.trunc(
-              (long || this.userDetails?.[3][0]!) * 10 ** LOCATION_DECIMALS
-            ).toString()
-          ),
+          lat: Math.trunc(
+            (lat || this.userDetails?.[3][1]!) * 10 ** LOCATION_DECIMALS
+          ).toString(),
+          lng: Math.trunc(
+            (long || this.userDetails?.[3][0]!) * 10 ** LOCATION_DECIMALS
+          ).toString(),
           account_type: account_type == AccountType.BUYER ? 0 : 1,
         };
 
@@ -276,8 +263,8 @@ export const useUserStore = defineStore(STORE_KEY, {
             update_user: {
               username: payload.username,
               phone: payload.phone,
-              lat: payload.lat,
-              long: payload.lng,
+              latitude: payload.lat,
+              longitude: payload.lng,
               account_type,
             },
           },
@@ -320,7 +307,7 @@ export const useUserStore = defineStore(STORE_KEY, {
           },
         });
 
-        return true;
+        return queryResult;
       } catch (error) {
         console.error("Error fetching location preference:", error);
         throw error;

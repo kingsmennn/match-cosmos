@@ -137,7 +137,7 @@ const requestDetails = ref<RequestResponse>()
 const requestsStore = useRequestsStore()
 const userStore = useUserStore()
 const fetchUserRequest = async () => {
-  const res = await requestsStore.getRequest(route.params.id as unknown as number)
+  const res = await requestsStore.getRequest(+route.params.id as unknown as number)
   requestDetails.value = res
 }
 

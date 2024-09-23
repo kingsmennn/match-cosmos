@@ -1,5 +1,11 @@
 import { defineStore } from "pinia";
-import { CreateOfferDTO, CreateRequestDTO, RequestResponse } from "@/types";
+import {
+  CreateOfferDTO,
+  CreateRequestDTO,
+  Offer,
+  RequestLifecycleIndex,
+  RequestResponse,
+} from "@/types";
 
 import BN from "bn.js";
 
@@ -36,6 +42,14 @@ export const useRequestsStore = defineStore("requests", {
       try {
         const contract = await userStore.getContract();
 
+        console.log({
+          name,
+          description,
+          images: [...images],
+          latitude: Math.trunc(latitude).toString(),
+          longitude: Math.trunc(longitude).toString(),
+        });
+
         const result = await contract.execute(
           userStore.accountId!,
           env.contractId,
@@ -44,8 +58,8 @@ export const useRequestsStore = defineStore("requests", {
               name,
               description,
               images: [...images],
-              latitude: new BN(Math.trunc(latitude).toString()),
-              longitude: new BN(Math.trunc(longitude).toString()),
+              latitude: Math.trunc(latitude).toString(),
+              longitude: Math.trunc(longitude).toString(),
             },
           },
           "auto"
@@ -68,43 +82,33 @@ export const useRequestsStore = defineStore("requests", {
           },
         });
 
-        throw new Error("not implemented");
-
-        // if (result.isErr) {
-        //   throw new Error(result.asErr.toString());
-        // }
-        // const userInfo = output?.toJSON();
-        // const userData = (userInfo as any)?.ok;
-
-        // const res: any = userData.map((request: any) => {
-        //   const lifecycle_ = request.lifecycle.toUpperCase();
-
-        //   let lifecycle: RequestLifecycleIndex = RequestLifecycleIndex.PENDING;
-
-        //   Object.entries(RequestLifecycleIndex).forEach(([key, value]) => {
-        //     if (key.replaceAll("_", "") === lifecycle_) {
-        //       lifecycle = value as RequestLifecycleIndex;
-        //     }
-        //   });
-
-        //   return {
-        //     requestId: Number(request.id),
-        //     requestName: request.name,
-        //     buyerId: Number(request.buyerId),
-        //     sellersPriceQuote: Number(request.sellersPriceQuote),
-        //     lockedSellerId: Number(request.lockedSellerId),
-        //     description: request.description,
-        //     lifecycle,
-        //     longitude: Number(request.location.longitude.toString()),
-        //     latitude: Number(request.location.latitude.toString()),
-        //     createdAt: Number(request.createdAt.toString() / 1000),
-        //     updatedAt: Number(request.updatedAt.toString() / 1000),
-        //     images: request.images,
-        //   };
-        // });
-
-        // this.list = res;
-        // return res;
+        const res = queryResult.map((request: any) => {
+          let lifecycle: RequestLifecycleIndex = RequestLifecycleIndex.PENDING;
+          Object.entries(RequestLifecycleIndex).forEach(([key, value]) => {
+            if (
+              key.replaceAll("_", "").toLowerCase() ===
+              request.lifecycle.toLowerCase()
+            ) {
+              lifecycle = value as RequestLifecycleIndex;
+            }
+          });
+          return {
+            requestId: Number(request.id),
+            requestName: request.name,
+            buyerId: Number(request.buyer_id),
+            sellersPriceQuote: Number(request.seller_price_quote),
+            lockedSellerId: Number(request.locked_seller_id),
+            description: request.description,
+            lifecycle: lifecycle,
+            longitude: Number(request.location.longitude.toString()),
+            latitude: Number(request.location.latitude.toString()),
+            createdAt: Number(request.created_at.toString()),
+            updatedAt: Number(request.updated_at.toString()),
+            images: request.images,
+          };
+        });
+        this.list = res;
+        return res;
       } catch (error) {
         console.log({ error });
         throw error;
@@ -180,46 +184,55 @@ export const useRequestsStore = defineStore("requests", {
       try {
         const userStore = useUserStore();
         const contract = await userStore.getContract();
-
-        const queryResult = await contract.queryContractSmart(env.contractId, {
+        console.log({
           get_request: {
             request_id: requestId,
           },
         });
 
-        throw new Error("not implemented");
+        const request = await contract.queryContractSmart(env.contractId, {
+          get_request: {
+            request_id: requestId,
+          },
+        });
 
-        // if (result.isErr) {
-        //   throw new Error(result.asErr.toString());
-        // } else {
-        //   const userInfo = output?.toJSON();
-        //   const userData = (userInfo as any)?.ok;
-
-        //   const lifecycle_ = userData.lifecycle.toUpperCase();
-
-        //   let lifecycle: RequestLifecycleIndex = RequestLifecycleIndex.PENDING;
-
-        //   Object.entries(RequestLifecycleIndex).forEach(([key, value]) => {
-        //     if (key.replaceAll("_", "") === lifecycle_) {
-        //       lifecycle = value as RequestLifecycleIndex;
-        //     }
-        //   });
-
-        //   return {
-        //     requestId: Number(userData.id),
-        //     requestName: userData.name,
-        //     buyerId: Number(userData.buyerId),
-        //     sellersPriceQuote: Number(userData.sellersPriceQuote),
-        //     lockedSellerId: Number(userData.lockedSellerId),
-        //     description: userData.description,
-        //     lifecycle,
-        //     longitude: Number(userData.location.longitude.toString()),
-        //     latitude: Number(userData.location.latitude.toString()),
-        //     createdAt: Number(userData.createdAt.toString() / 1000),
-        //     updatedAt: Number(userData.updatedAt.toString() / 1000),
-        //     images: userData.images,
-        //   };
-        // }
+        let lifecycle: RequestLifecycleIndex = RequestLifecycleIndex.PENDING;
+        Object.entries(RequestLifecycleIndex).forEach(([key, value]) => {
+          if (
+            key.replaceAll("_", "").toLowerCase() ===
+            request.lifecycle.toLowerCase()
+          ) {
+            lifecycle = value as RequestLifecycleIndex;
+          }
+        });
+        console.log({
+          requestId: Number(request.id),
+          requestName: request.name,
+          buyerId: Number(request.buyer_id),
+          sellersPriceQuote: Number(request.seller_price_quote),
+          lockedSellerId: Number(request.locked_seller_id),
+          description: request.description,
+          lifecycle: lifecycle,
+          longitude: Number(request.location.longitude.toString()),
+          latitude: Number(request.location.latitude.toString()),
+          createdAt: Number(request.created_at.toString()),
+          updatedAt: Number(request.updated_at.toString()),
+          images: request.images,
+        });
+        return {
+          requestId: Number(request.id),
+          requestName: request.name,
+          buyerId: Number(request.buyer_id),
+          sellersPriceQuote: Number(request.seller_price_quote),
+          lockedSellerId: Number(request.locked_seller_id),
+          description: request.description,
+          lifecycle: lifecycle,
+          longitude: Number(request.location.longitude.toString()),
+          latitude: Number(request.location.latitude.toString()),
+          createdAt: Number(request.created_at.toString()),
+          updatedAt: Number(request.updated_at.toString()),
+          images: request.images,
+        };
       } catch (error) {
         console.log(error);
         throw error;
@@ -357,35 +370,22 @@ export const useRequestsStore = defineStore("requests", {
             request_id: requestId,
           },
         });
+        const res: any = queryResult.map((offer: any) => {
+          return {
+            id: Number(offer.id),
+            offerId: Number(offer.id),
+            price: Number(offer.price),
+            images: offer.images,
+            requestId: offer.request_id,
+            storeName: offer.store_name,
+            sellerId: offer.seller_id,
+            isAccepted: offer.is_accepted,
+            createdAt: new Date(Number(offer.created_at)),
+            updatedAt: new Date(Number(offer.updated_at)),
+          };
+        });
 
-        throw new Error("not implemented");
-
-        // if (result.isErr) {
-        //   throw new Error(result.asErr.toString());
-        // } else {
-        //   const userInfo = output?.toJSON();
-        //   const userData = (userInfo as any)?.ok;
-        //   console.log(userData);
-
-        //   const res: any = userData.map((offer: any) => {
-        //     const offer_: Offer = {
-        //       id: Number(offer.id),
-        //       offerId: Number(offer.id),
-        //       price: Number(offer.price),
-        //       images: offer.images,
-        //       requestId: offer.requestId,
-        //       storeName: offer.storeName,
-        //       sellerId: offer.sellerId,
-        //       isAccepted: offer.isAccepted,
-        //       createdAt: new Date(Number(offer.createdAt)),
-        //       updatedAt: new Date(Number(offer.updatedAt)),
-        //     };
-
-        //     return offer_;
-        //   });
-
-        //   return res;
-        // }
+        return res;
       } catch (error) {
         console.log({ error });
         throw error;
