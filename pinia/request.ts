@@ -175,20 +175,7 @@ export const useRequestsStore = defineStore("requests", {
             lifecycle = value as RequestLifecycleIndex;
           }
         });
-        console.log({
-          requestId: Number(request.id),
-          requestName: request.name,
-          buyerId: Number(request.buyer_id),
-          sellersPriceQuote: Number(request.seller_price_quote),
-          lockedSellerId: Number(request.locked_seller_id),
-          description: request.description,
-          lifecycle: lifecycle,
-          longitude: Number(request.location.longitude.toString()),
-          latitude: Number(request.location.latitude.toString()),
-          createdAt: Number(request.created_at.toString()),
-          updatedAt: Number(request.updated_at.toString()),
-          images: request.images,
-        });
+
         return {
           requestId: Number(request.id),
           requestName: request.name,
@@ -207,19 +194,6 @@ export const useRequestsStore = defineStore("requests", {
         console.log(error);
         throw error;
       }
-    },
-    async getRequestImages(request_id: number): Promise<string[] | undefined> {
-      const userStore = useUserStore();
-
-      const contract = await userStore.getContract();
-      // const length = await contract.getRequestImagesLength(request_id);
-
-      // const images = [];
-      // for (let i = 0; i < length; i++) {
-      //   const image = await contract.getRequestImageByIndex(request_id, i);
-      //   images.push(image);
-      // }
-      return [];
     },
 
     // SELLERS
