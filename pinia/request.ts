@@ -124,57 +124,35 @@ export const useRequestsStore = defineStore("requests", {
             address: accountId,
           },
         });
-        // if (result.isErr) {
-        //   throw new Error(result.asErr.toString());
-        // }
 
-        // const offersData = output?.toJSON();
+        const requests = queryResult.map((request: any) => {
+          let lifecycle: RequestLifecycleIndex = RequestLifecycleIndex.PENDING;
+          Object.entries(RequestLifecycleIndex).forEach(([key, value]) => {
+            if (
+              key.replaceAll("_", "").toLowerCase() ===
+              request.lifecycle.toLowerCase()
+            ) {
+              lifecycle = value as RequestLifecycleIndex;
+            }
+          });
+          return {
+            requestId: Number(request.id),
+            requestName: request.name,
+            buyerId: Number(request.buyer_id),
+            sellersPriceQuote: Number(request.seller_price_quote),
+            lockedSellerId: Number(request.locked_seller_id),
+            description: request.description,
+            lifecycle: lifecycle,
+            longitude: Number(request.location.longitude.toString()),
+            latitude: Number(request.location.latitude.toString()),
+            createdAt: Number(request.created_at.toString()),
+            updatedAt: Number(request.updated_at.toString()),
+            images: request.images,
+          };
+        });
 
-        // const offers = (offersData as any).ok;
-
-        // const requests = [];
-
-        // for (const offer of offers) {
-        //   const queryResult = await contract.queryContractSmart(
-        //     env.contractId,
-        //     {
-        //       get_request: {
-        //         request_id: offer.requestId,
-        //       },
-        //     }
-        //   );
-
-        //   const requestData = (requestOutput?.toJSON() as any).ok;
-
-        //   if (requestData) {
-        //     const lifecycle_ = requestData.lifecycle.toUpperCase();
-        //     let lifecycle: RequestLifecycleIndex =
-        //       RequestLifecycleIndex.PENDING;
-        //     Object.entries(RequestLifecycleIndex).forEach(([key, value]) => {
-        //       if (key.replaceAll("_", "") === lifecycle_) {
-        //         lifecycle = value as RequestLifecycleIndex;
-        //       }
-        //     });
-
-        //     requests.push({
-        //       requestId: Number(requestData.id),
-        //       requestName: requestData.name,
-        //       buyerId: Number(requestData.buyerId),
-        //       sellersPriceQuote: Number(requestData.sellersPriceQuote),
-        //       lockedSellerId: Number(requestData.lockedSellerId),
-        //       description: requestData.description,
-        //       lifecycle,
-        //       longitude: Number(requestData.location.longitude.toString()),
-        //       latitude: Number(requestData.location.latitude.toString()),
-        //       createdAt: Number(requestData.createdAt.toString() / 1000),
-        //       updatedAt: Number(requestData.updatedAt.toString() / 1000),
-        //       images: requestData.images,
-        //     });
-        //   }
-        // }
-
-        // this.list = requests;
-        // return requests;
+        this.list = requests;
+        return requests;
       } catch (error) {
         console.error("Error fetching seller requests:", error);
         throw error;
@@ -268,43 +246,34 @@ export const useRequestsStore = defineStore("requests", {
           get_all_requests: {},
         });
 
-        throw new Error("not implemented");
-        // if (result.isErr) {
-        //   throw new Error(result.asErr.toString());
-        // } else {
-        //   const userInfo = output?.toJSON();
-        //   const userData = (userInfo as any)?.ok;
-        //   const res: any = userData.map((request: any) => {
-        //     const lifecycle_ = request.lifecycle.toUpperCase();
+        const requests = queryResult.map((request: any) => {
+          let lifecycle: RequestLifecycleIndex = RequestLifecycleIndex.PENDING;
+          Object.entries(RequestLifecycleIndex).forEach(([key, value]) => {
+            if (
+              key.replaceAll("_", "").toLowerCase() ===
+              request.lifecycle.toLowerCase()
+            ) {
+              lifecycle = value as RequestLifecycleIndex;
+            }
+          });
+          return {
+            requestId: Number(request.id),
+            requestName: request.name,
+            buyerId: Number(request.buyer_id),
+            sellersPriceQuote: Number(request.seller_price_quote),
+            lockedSellerId: Number(request.locked_seller_id),
+            description: request.description,
+            lifecycle: lifecycle,
+            longitude: Number(request.location.longitude.toString()),
+            latitude: Number(request.location.latitude.toString()),
+            createdAt: Number(request.created_at.toString()),
+            updatedAt: Number(request.updated_at.toString()),
+            images: request.images,
+          };
+        });
 
-        //     let lifecycle: RequestLifecycleIndex =
-        //       RequestLifecycleIndex.PENDING;
-
-        //     Object.entries(RequestLifecycleIndex).forEach(([key, value]) => {
-        //       if (key.replaceAll("_", "") === lifecycle_) {
-        //         lifecycle = value as RequestLifecycleIndex;
-        //       }
-        //     });
-
-        //     return {
-        //       requestId: Number(request.id),
-        //       requestName: request.name,
-        //       buyerId: Number(request.buyerId),
-        //       sellersPriceQuote: Number(request.sellersPriceQuote),
-        //       lockedSellerId: Number(request.lockedSellerId),
-        //       description: request.description,
-        //       lifecycle,
-        //       longitude: Number(request.location.longitude.toString()),
-        //       latitude: Number(request.location.latitude.toString()),
-        //       createdAt: Number(request.createdAt.toString() / 1000),
-        //       updatedAt: Number(request.updatedAt.toString() / 1000),
-        //       images: request.images,
-        //     };
-        //   });
-
-        //   this.list = res;
-        //   return res;
-        // }
+        this.list = requests;
+        return requests;
       } catch (error) {
         console.log({ error });
         throw error;
@@ -327,7 +296,7 @@ export const useRequestsStore = defineStore("requests", {
           {
             create_offer: {
               request_id: requestId,
-              price,
+              price: price.toString(),
               images: [...images],
               store_name: storeName,
             },

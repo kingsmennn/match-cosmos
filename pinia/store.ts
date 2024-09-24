@@ -67,32 +67,21 @@ export const useStoreStore = defineStore(STORE_STORE_KEY, {
           },
         });
 
-        return queryResult;
+        const response: Store[] = queryResult.map((store: any) => {
+          return {
+            id: store.id.toString(),
+            name: store.name,
+            description: store.description,
+            phone: store.phone,
+            location: [
+              Number(store.location.longitude.toString()),
+              Number(store.location.latitude.toString()),
+            ],
+          };
+        });
 
-        throw new Error("not implemented");
-
-        // if (result.isErr) {
-        //   throw new Error(result.asErr.toString());
-        // } else {
-        //   const userInfo = output?.toJSON();
-        //   const userData = (userInfo as any)?.ok;
-
-        //   const response: Store[] = userData.map((store: any) => {
-        //     return {
-        //       id: store.id.toString(),
-        //       name: store.name,
-        //       description: store.description,
-        //       phone: store.phone,
-        //       location: [
-        //         Number(store.location.longitude.toString()),
-        //         Number(store.location.latitude.toString()),
-        //       ],
-        //     };
-        //   });
-
-        //   userStore.storeDetails = response;
-        //   return response;
-        // }
+        userStore.storeDetails = response;
+        return response;
       } catch (error) {
         console.log({ error });
         throw error;
