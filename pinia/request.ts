@@ -42,14 +42,6 @@ export const useRequestsStore = defineStore("requests", {
       try {
         const contract = await userStore.getContract();
 
-        console.log({
-          name,
-          description,
-          images: [...images],
-          latitude: Math.trunc(latitude).toString(),
-          longitude: Math.trunc(longitude).toString(),
-        });
-
         const result = await contract.execute(
           userStore.accountId!,
           env.contractId,
