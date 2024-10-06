@@ -13,6 +13,9 @@ import { LOCATION_DECIMALS } from "@/utils/constants";
 import { useStoreStore } from "./store";
 import { Decimal, SigningCosmWasmClient } from "cosmwasm";
 import BN from "bn.js";
+import { Coin, SigningStargateClient, StdFee } from "@cosmjs/stargate";
+import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
+import { toUtf8 } from "@cosmjs/encoding";
 
 type UserStore = {
   accountId: string | null;
@@ -29,6 +32,7 @@ export const env = useRuntimeConfig().public;
 
 export const storageDepositLimit = null;
 let apiInstance: SigningCosmWasmClient | null = null;
+let apiInstanceExec: SigningStargateClient | null = null;
 
 export const useUserStore = defineStore(STORE_KEY, {
   state: (): UserStore => ({
@@ -102,6 +106,38 @@ export const useUserStore = defineStore(STORE_KEY, {
     },
     async getContract() {
       const api = await this.cosmosApi();
+
+      return {
+        queryContractSmart: api.queryContractSmart.bind(api),
+        execute: async (
+          senderAddress: string,
+          contractAddress: string,
+          msg: Record<string, unknown>,
+          fee: StdFee | "auto" | number,
+          memo?: string,
+          funds?: readonly Coin[]
+        ): Promise<any> => {
+          const contract = await this.cosmosApiExecute();
+          const executeMsg = {
+            typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
+            value: MsgExecuteContract.fromPartial({
+              sender: senderAddress,
+              contract: contractAddress,
+              msg: toUtf8(JSON.stringify(msg)),
+              funds: [], //TODO: add method to take funds
+            }),
+          };
+          const result = await contract.signAndBroadcast(
+            contractAddress,
+            [executeMsg],
+            fee
+          );
+          // Check the result
+          if (result.code !== 0) {
+            throw new Error(`Failed to execute contract: ${result.rawLog}`);
+          }
+        },
+      };
       return api;
     },
 
@@ -366,6 +402,23 @@ export const useUserStore = defineStore(STORE_KEY, {
         }
       );
       return apiInstance;
+    },
+    async cosmosApiExecute() {
+      if (apiInstanceExec) {
+        return apiInstanceExec;
+      }
+
+      apiInstanceExec = await SigningStargateClient.connectWithSigner(
+        cosmosChainInfo.rpc,
+        window.getOfflineSigner(cosmosChainInfo.chainId),
+        {
+          gasPrice: {
+            amount: Decimal.fromUserInput("0.025", 6), // Amount of gas price
+            denom: "uatom", // Denomination of the token used for fees (example for Cosmos)
+          },
+        }
+      );
+      return apiInstanceExec;
     },
 
     async getUserLocation() {
