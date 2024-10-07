@@ -150,7 +150,6 @@ export const useUserStore = defineStore(STORE_KEY, {
           return result;
         },
       };
-      return api;
     },
 
     async disconnect() {
