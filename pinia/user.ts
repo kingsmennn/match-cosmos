@@ -11,12 +11,13 @@ import {
 } from "@/types";
 import { LOCATION_DECIMALS } from "@/utils/constants";
 import { useStoreStore } from "./store";
-import { Decimal, SigningCosmWasmClient } from "cosmwasm";
+import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { Coin, SigningStargateClient, StdFee } from "@cosmjs/stargate";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { toUtf8 } from "@cosmjs/encoding";
 import { Registry } from "@cosmjs/proto-signing";
 import { defaultRegistryTypes } from "@cosmjs/stargate";
+import { Decimal } from "@cosmjs/math";
 
 type UserStore = {
   accountId: string | null;
@@ -133,7 +134,8 @@ export const useUserStore = defineStore(STORE_KEY, {
           const result = await contract.signAndBroadcast(
             senderAddress,
             [executeMsg],
-            fee
+            fee,
+            memo
           );
 
           if (result.code !== 0) {
