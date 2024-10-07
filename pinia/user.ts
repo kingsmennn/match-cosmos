@@ -16,6 +16,8 @@ import BN from "bn.js";
 import { Coin, SigningStargateClient, StdFee } from "@cosmjs/stargate";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { toUtf8 } from "@cosmjs/encoding";
+import { Registry } from "@cosmjs/proto-signing";
+import { defaultRegistryTypes } from "@cosmjs/stargate";
 
 type UserStore = {
   accountId: string | null;
@@ -416,6 +418,10 @@ export const useUserStore = defineStore(STORE_KEY, {
             amount: Decimal.fromUserInput("0.025", 6), // Amount of gas price
             denom: "uatom", // Denomination of the token used for fees (example for Cosmos)
           },
+          registry: new Registry([
+            ...defaultRegistryTypes,
+            ["/cosmwasm.wasm.v1.MsgExecuteContract", MsgExecuteContract],
+          ]),
         }
       );
       return apiInstanceExec;
