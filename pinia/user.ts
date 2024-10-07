@@ -120,13 +120,14 @@ export const useUserStore = defineStore(STORE_KEY, {
           funds?: readonly Coin[]
         ): Promise<any> => {
           const contract = await this.cosmosApiExecute();
+          const mutableFunds: Coin[] = funds ? [...funds] : [];
           const executeMsg = {
             typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
             value: MsgExecuteContract.fromPartial({
               sender: senderAddress,
               contract: contractAddress,
               msg: toUtf8(JSON.stringify(msg)),
-              funds: [], //TODO: add method to take funds
+              funds: mutableFunds,
             }),
           };
           const result = await contract.signAndBroadcast(
