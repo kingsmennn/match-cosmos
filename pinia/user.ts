@@ -139,8 +139,10 @@ export const useUserStore = defineStore(STORE_KEY, {
           );
 
           if (result.code !== 0) {
-            throw new Error(`Failed to execute contract: ${result.rawLog}`);
+            throw new Error(`Failed to execute contract: ${result.code}`);
           }
+
+          return result;
         },
       };
       return api;
