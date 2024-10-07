@@ -68,14 +68,11 @@ export const useUserStore = defineStore(STORE_KEY, {
   },
   actions: {
     async setUpCosmosConnectEvents() {
+      window.addEventListener("keplr_keystorechange", async () => {
+        this.blockchainError.userNotFound = false;
+        this.connectToCosmos();
+      });
       this.connectToCosmos();
-      // web3AccountsSubscribe((accounts) => {
-      //   if (accounts.length) {
-      //     this.blockchainError.userNotFound = false;
-      //     this.accountId = accounts[0].address;
-      //     this.connectToCosmos();
-      //   }
-      // });
     },
     async connectToCosmos() {
       try {
