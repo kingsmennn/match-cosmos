@@ -12,7 +12,6 @@ import {
 import { LOCATION_DECIMALS } from "@/utils/constants";
 import { useStoreStore } from "./store";
 import { Decimal, SigningCosmWasmClient } from "cosmwasm";
-import BN from "bn.js";
 import { Coin, SigningStargateClient, StdFee } from "@cosmjs/stargate";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { toUtf8 } from "@cosmjs/encoding";
@@ -120,6 +119,7 @@ export const useUserStore = defineStore(STORE_KEY, {
           funds?: readonly Coin[]
         ): Promise<any> => {
           const contract = await this.cosmosApiExecute();
+
           const mutableFunds: Coin[] = funds ? [...funds] : [];
           const executeMsg = {
             typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
@@ -131,11 +131,11 @@ export const useUserStore = defineStore(STORE_KEY, {
             }),
           };
           const result = await contract.signAndBroadcast(
-            contractAddress,
+            senderAddress,
             [executeMsg],
             fee
           );
-          // Check the result
+
           if (result.code !== 0) {
             throw new Error(`Failed to execute contract: ${result.rawLog}`);
           }
