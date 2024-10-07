@@ -12,7 +12,12 @@ import {
 import { LOCATION_DECIMALS } from "@/utils/constants";
 import { useStoreStore } from "./store";
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import { Coin, SigningStargateClient, StdFee } from "@cosmjs/stargate";
+import {
+  Coin,
+  DeliverTxResponse,
+  SigningStargateClient,
+  StdFee,
+} from "@cosmjs/stargate";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { toUtf8 } from "@cosmjs/encoding";
 import { Registry } from "@cosmjs/proto-signing";
@@ -118,7 +123,7 @@ export const useUserStore = defineStore(STORE_KEY, {
           fee: StdFee | "auto" | number,
           memo?: string,
           funds?: readonly Coin[]
-        ): Promise<any> => {
+        ): Promise<DeliverTxResponse> => {
           const contract = await this.cosmosApiExecute();
 
           const mutableFunds: Coin[] = funds ? [...funds] : [];
